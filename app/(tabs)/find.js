@@ -3,7 +3,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 
 
-export default function Index () {
+export default function Find () {
     return (
         <SafeAreaProvider>
             <SafeAreaView>

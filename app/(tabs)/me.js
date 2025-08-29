@@ -1,9 +1,9 @@
+import { Link } from "expo-router";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Link } from "expo-router";
 
 
-export default function Index () {
+export default function Me () {
     return (
         <SafeAreaProvider>
             <SafeAreaView>
