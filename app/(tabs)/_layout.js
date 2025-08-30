@@ -2,7 +2,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import Foundation from '@expo/vector-icons/Foundation';
 import { Tabs } from "expo-router";
-import { colors } from "../../theme/color";
+import { colors } from "../../theme/colors";
 
 export default function Layout () {
     return (
