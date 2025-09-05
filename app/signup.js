@@ -1,8 +1,15 @@
 import { Link } from "expo-router";
+import { useState } from "react";
 import { Image, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { colors } from "../theme/colors";
 
 export default function Signup() {
+    // this will capture our email text input as we are typing
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+    console.log("email", email)
+
     return (
         <View style={styles.wrapper}>
             {/* header group */}
@@ -25,7 +32,7 @@ export default function Signup() {
                         source={require("../assets/images/google.png")}></Image>
                     <Text style={styles.signInText}>Google</Text>
                 </TouchableOpacity>
-                
+
                 {/* OR */}
                 <View style={styles.orSec}>
                     <View style={styles.line}></View>
@@ -36,14 +43,35 @@ export default function Signup() {
                 {/* create account with email and password */}
                 <View style={styles.emailSec}>
                     <TextInput
-                    keyboardType="email-address"
-                    style={styles.input}
-                    placeholder="eg. john@example.com"/>
-                    
+                        keyboardType="email-address"
+                        style={styles.input}
+                        placeholder="eg. john@example.com"
+                        // assign the current value of the textinput
+                        value={email}
+                        onChangeText={(text) => setEmail(text)} />
+
                     <TextInput
-                    keyboardType="default"
-                    style={styles.input}
-                    placeholder="create"/>
+                        secureTextEntry={true}
+                        keyboardType="default"
+                        style={styles.input}
+                        placeholder="create password"
+                        value={password}
+                        onChangeText={(text) => setPassword(text)} />
+
+                    {password.length >= 8 &&
+                        <TextInput
+                            secureTextEntry={true}
+                            keyboardType="default"
+                            style={styles.input}
+                            placeholder="confirm password"
+                            value={passwordConfirmation}
+                            onChangeText={(text) => setPasswordConfirmation(text)} />}
+
+                    {password.length >= 8 && password == passwordConfirmation &&
+                        <TouchableOpacity style={styles.signupBtn}>
+                            <Text style={styles.signInText}>Create Account</Text>
+                        </TouchableOpacity>
+                    }
                 </View>
 
                 {/* already have an account? */}
@@ -157,5 +185,5 @@ const styles = StyleSheet.create({
         fontSize: 16,
         paddingHorizontal: 6,
     },
-    
+
 });
