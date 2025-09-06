@@ -1,6 +1,6 @@
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Image, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { colors } from "../theme/colors";
 
 export default function Signup() {
@@ -11,93 +11,107 @@ export default function Signup() {
     console.log("email", email)
 
     return (
-        <View style={styles.wrapper}>
-            {/* header group */}
-            <View style={styles.header}>
-                <Text style={styles.brandName}>Copreneur</Text>
-                <Text style={styles.brandDesc}>Where entrepreneurs collaborate with developers</Text>
-            </View>
+        <KeyboardAvoidingView
+            style={styles.wrapper}
+            behavior="padding"
+            keyboardVerticalOffset={Platform.select({
+                ios: 0,
+                android: -StatusBar.currentHeight,
+            })}>
 
-            {/* body group  */}
-            <View style={styles.body}>
-                <Text style={styles.bodyText}>Create account</Text>
+            <ScrollView
+                contentContainerStyle={styles.ScrollViewContainer}
+                showsVerticalScrollIndicator={false}>
 
-                {/* create account with google */}
-                <TouchableOpacity style={styles.signupBtn}>
-                    <Image
-                        style={{
-                            width: 36,
-                            height: 36,
-                        }}
-                        source={require("../assets/images/google.png")}></Image>
-                    <Text style={styles.signInText}>Google</Text>
-                </TouchableOpacity>
-
-                {/* OR */}
-                <View style={styles.orSec}>
-                    <View style={styles.line}></View>
-                    <Text style={styles.orText}>OR</Text>
-                    <View style={styles.line}></View>
+                {/* header group */}
+                <View style={styles.header}>
+                    <Text style={styles.brandName}>Copreneur</Text>
+                    <Text style={styles.brandDesc}>Where entrepreneurs collaborate with developers</Text>
                 </View>
 
-                {/* create account with email and password */}
-                <View style={styles.emailSec}>
-                    <TextInput
-                        keyboardType="email-address"
-                        style={styles.input}
-                        placeholder="eg. john@example.com"
-                        // assign the current value of the textinput
-                        value={email}
-                        onChangeText={(text) => setEmail(text)} />
+                {/* body group  */}
+                <View style={styles.body}>
+                    <Text style={styles.bodyText}>Create account</Text>
 
-                    <TextInput
-                        secureTextEntry={true}
-                        keyboardType="default"
-                        style={styles.input}
-                        placeholder="create password"
-                        value={password}
-                        onChangeText={(text) => setPassword(text)} />
+                    {/* create account with google */}
+                    <TouchableOpacity style={styles.signupBtn}>
+                        <Image
+                            style={{
+                                width: 36,
+                                height: 36,
+                            }}
+                            source={require("../assets/images/google.png")}></Image>
+                        <Text style={styles.signInText}>Google</Text>
+                    </TouchableOpacity>
 
-                    {password.length >= 8 &&
+                    {/* OR */}
+                    <View style={styles.orSec}>
+                        <View style={styles.line}></View>
+                        <Text style={styles.orText}>OR</Text>
+                        <View style={styles.line}></View>
+                    </View>
+
+                    {/* create account with email and password */}
+                    <View style={styles.emailSec}>
+                        <TextInput
+                            keyboardType="email-address"
+                            style={styles.input}
+                            placeholder="eg. john@example.com"
+                            // assign the current value of the textinput
+                            value={email}
+                            onChangeText={(text) => setEmail(text)} />
+
                         <TextInput
                             secureTextEntry={true}
                             keyboardType="default"
                             style={styles.input}
-                            placeholder="confirm password"
-                            value={passwordConfirmation}
-                            onChangeText={(text) => setPasswordConfirmation(text)} />}
+                            placeholder="create password"
+                            value={password}
+                            onChangeText={(text) => setPassword(text)} />
 
-                    {password.length >= 8 && password == passwordConfirmation &&
-                        <TouchableOpacity style={styles.signupBtn}>
-                            <Text style={styles.signInText}>Create Account</Text>
-                        </TouchableOpacity>
-                    }
+                        {password.length >= 8 &&
+                            <TextInput
+                                secureTextEntry={true}
+                                keyboardType="default"
+                                style={styles.input}
+                                placeholder="confirm password"
+                                value={passwordConfirmation}
+                                onChangeText={(text) => setPasswordConfirmation(text)} />}
+
+                        {password.length >= 8 && password == passwordConfirmation &&
+                            <TouchableOpacity style={styles.signupBtn}>
+                                <Text style={styles.signInText}>Create Account</Text>
+                            </TouchableOpacity>
+                        }
+                    </View>
+
+                    {/* already have an account? */}
+                    <View style={styles.already}>
+                        <Text style={styles.alreadyText}>Already have an account?</Text>
+                        <Link href="/signin" style={styles.alreadyLink}>Go to sign in</Link>
+                    </View>
                 </View>
 
-                {/* already have an account? */}
-                <View style={styles.already}>
-                    <Text style={styles.alreadyText}>Already have an account?</Text>
-                    <Link href="/signin" style={styles.alreadyLink}>Go to sign in</Link>
+                {/* bottom group */}
+                <View style={styles.footer}>
+                    <Link href="/about" style={styles.footerLink}>About Copreneur</Link>
+                    <Link href="/about" style={styles.footerLink}>Home</Link>
                 </View>
-            </View>
-
-            {/* bottom group */}
-            <View style={styles.footer}>
-                <Link href="/about" style={styles.footerLink}>About Copreneur</Link>
-                <Link href="/about" style={styles.footerLink}>Home</Link>
-            </View>
-        </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
-        display: "flex",
-        justifyContent: "space-between",
         backgroundColor: colors.brown200,
         paddingTop: StatusBar.currentHeight,
-        paddingBottom: 40,
+    },
+    ScrollViewContainer: {
+        flexGrow: 1,
+        justifyContent: "space-between",
+        marginBottom: 40,
     },
     header: {
         display: "flex",
