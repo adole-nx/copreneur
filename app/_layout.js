@@ -5,7 +5,7 @@ export default function RootLayout() {
   const session = false;
 
   return (
-    <Stack>
+    <Stack screenOptions={{headerShown: false}}>
       {session == true ?
       <Stack.Screen
       name="(tabs)"
