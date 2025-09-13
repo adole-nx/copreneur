@@ -1,46 +1,50 @@
 import { Stack } from "expo-router";
+import { useContext } from "react";
+import { AuthContext, AuthProvider } from "./../config/auth-context.config";
 import "./global.css";
 
 export default function RootLayout() {
-  const session = false;
+  const { user } = useContext(AuthContext);
 
   return (
-    <Stack screenOptions={{headerShown: false}}>
-      {session == true ?
-      <Stack.Screen
-      name="(tabs)"
-      options={{
-        title: "Home",
-        headerShown: false
-      }}/>
-      :
-      <Stack.Screen
-      name="signup"
-      options={{
-        title: "Create a new accout",
-        headerShown: false,
-      }}/>
-      }
-      
-      <Stack.Screen
-      name="index"
-      options={{
-        title: "Welcome",
-        headerShown: false,
-      }}/>
-      
-      <Stack.Screen
-      name="about"
-      options={{
-        title: "About copreneur",
-        headerShown: false,
-      }}/>
-      <Stack.Screen
-      name="signin"
-      options={{
-        title: "Sign In",
-        headerShown: false,
-      }}/>
-    </Stack>
+    <AuthProvider>
+      <Stack>
+        {user !== undefined?
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              title: "Home",
+              headerShown: false
+            }} />
+          :
+          <Stack.Screen
+            name="signin"
+            options={{
+              title: "Sign In",
+              headerShown: false,
+            }} />
+        }
+
+        <Stack.Screen
+          name="index"
+          options={{
+            title: "Welcome",
+            headerShown: false,
+          }} />
+
+        <Stack.Screen
+          name="about"
+          options={{
+            title: "About copreneur",
+            headerShown: false,
+          }} />
+        <Stack.Screen
+          name="signup"
+          options={{
+            title: "Create a new accout",
+            headerShown: false,
+          }} />
+      </Stack>
+    </AuthProvider>
   )
 }

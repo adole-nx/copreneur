@@ -1,75 +1,153 @@
-import { Link } from "expo-router";
-import { Image, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Link, useRouter } from "expo-router";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useFormik } from "formik";
+import { useState } from "react";
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { auth } from "../config/firebase.secret";
 import { colors } from "../theme/colors";
+import { signinValidation } from "../utilis/signup-validation-schema";
 
 export default function Signin() {
-    return (
-        <View style={styles.wrapper}>
-            {/* header group */}
-            <View style={styles.header}>
-                <Text style={styles.brandName}>Copreneur</Text>
-                <Text style={styles.brandDesc}>Where entrepreneurs collaborate with developers</Text>
-            </View>
+    const [isLoading,setIsLoading] = useState(false);
+    const authenticated = getAuth();
 
-            {/* body group  */}
-            <View style={styles.body}>
-                <Text style={styles.bodyText}>Sign in to your account</Text>
+    const router = useRouter();
 
-                {/* create account with google */}
-                <TouchableOpacity style={styles.signupBtn}>
-                    <Image
-                        style={{
-                            width: 36,
-                            height: 36,
-                        }}
-                        source={require("../assets/images/google.png")}></Image>
-                    <Text style={styles.signInText}>Google</Text>
-                </TouchableOpacity>
+    const { handleBlur, handleChange, handleSubmit, touched, errors, values } = useFormik({
+        initialValues: { email: "", password: ""},
+        onSubmit: async () => {
+            setIsLoading(true);
+
+            try {
+                 // create a new user account
+                 const user = await signInWithEmailAndPassword(auth,values.email,values.password)
+                 setIsLoading(false); // stops ActivityIndicator
                 
-                {/* OR */}
-                <View style={styles.orSec}>
-                    <View style={styles.line}></View>
-                    <Text style={styles.orText}>OR</Text>
-                    <View style={styles.line}></View>
+                 //redirect to home
+                if (authenticated.currentUser) {
+                    router.replace("/(tabs)");
+                }
+            
+            } catch (error) {
+                Alert.alert(
+                    "Message",
+                    "Invalid email or password",
+                    [{text: "okay"}]
+                );
+                console.error(error);
+                setIsLoading;
+             }
+        },
+        validationSchema: signinValidation
+    });
+
+    return (
+        <KeyboardAvoidingView
+            style={styles.wrapper}
+            behavior="padding"
+            keyboardVerticalOffset={Platform.select({
+                ios: 0,
+                android: -StatusBar.currentHeight,
+            })}>
+
+            <ScrollView
+                contentContainerStyle={styles.ScrollViewContainer}
+                showsVerticalScrollIndicator={false}>
+
+                {/* header group */}
+                <View style={styles.header}>
+                    <Text style={styles.brandName}>Copreneur</Text>
+                    <Text style={styles.brandDesc}>Where entrepreneurs collaborate with developers</Text>
                 </View>
 
-                {/* create account with email and password */}
-                <View style={styles.emailSec}>
-                    <TextInput
-                    keyboardType="email-address"
-                    style={styles.input}
-                    placeholder="eg. john@example.com"/>
-                    
-                    <TextInput
-                    keyboardType="default"
-                    style={styles.input}
-                    placeholder="create"/>
+                {/* body group  */}
+                <View style={styles.body}>
+                    <Text style={styles.bodyText}>Create account</Text>
+
+                    {/* create account with google */}
+                    <TouchableOpacity style={styles.signupBtn}>
+                        <Image
+                            style={{
+                                width: 36,
+                                height: 36,
+                            }}
+                            source={require("../assets/images/google.png")}></Image>
+                        <Text style={styles.signInText}>Google</Text>
+                    </TouchableOpacity>
+
+                    {/* OR */}
+                    <View style={styles.orSec}>
+                        <View style={styles.line}></View>
+                        <Text style={styles.orText}>OR</Text>
+                        <View style={styles.line}></View>
+                    </View>
+
+                    {/* sign in to account with email and password */}
+                    <View style={styles.form}>
+
+                        <View style={styles.inputBlock}>
+                            <TextInput
+                                keyboardType="email-address"
+                                style={styles.input}
+                                placeholder="eg. john@example.com"
+                                // assign the current value of the textinput
+                                value={values.email}
+                                onChangeText={handleChange("email")}
+                                onBlur={handleBlur("email")}
+                            />
+                            {errors.email && touched.email &&
+                                <Text style={styles.errormsg}>{errors.email}</Text>}
+
+                        </View>
+                                                
+                        
+                        <View style={styles.inputBlock}>
+                            <TextInput
+                                secureTextEntry={true}
+                                keyboardType="default"
+                                style={styles.input}
+                                placeholder="input password"
+                                value={values.password}
+                                onChangeText={handleChange("password")}
+                                onBlur={handleBlur("password")}/>
+                            {errors.password && touched.password &&
+                                <Text style={styles.errormsg}>{errors.password}</Text>}
+                        </View>
+
+                            <TouchableOpacity onPress={handleSubmit} style={styles.signupBtn}>
+                                {isLoading ?
+                                <ActivityIndicator size="large" color="white"/> :
+                                <Text style={styles.signInText}>Sign in</Text>}
+                            </TouchableOpacity>
+                    </View>
+
+                    {/* already have an account? */}
+                    <View style={styles.already}>
+                        <Text style={styles.alreadyText}>Already have an account?</Text>
+                        <Link href="/signup" style={styles.alreadyLink}>Go to sign up</Link>
+                    </View>
                 </View>
 
-                {/* already have an account? */}
-                <View style={styles.already}>
-                    <Text style={styles.alreadyText}>Don;t have an account?</Text>
-                    <Link href="/signup" style={styles.alreadyLink}>Go to sign up</Link>
+                {/* bottom group */}
+                <View style={styles.footer}>
+                    <Link href="/about" style={styles.footerLink}>About Copreneur</Link>
+                    <Link href="/about" style={styles.footerLink}>Home</Link>
                 </View>
-            </View>
-
-            {/* bottom group */}
-            <View style={styles.footer}>
-                <Link href="/about" style={styles.footerLink}>About Copreneur</Link>
-                <Link href="/about" style={styles.footerLink}>Home</Link>
-            </View>
-        </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
-        display: "flex",
-        justifyContent: "space-between",
-        backgroundColor: colors.brown100,
+        backgroundColor: colors.brown200,
         paddingTop: StatusBar.currentHeight,
-        paddingBottom: 40,
+    },
+    ScrollViewContainer: {
+        flexGrow: 1,
+        justifyContent: "space-between",
+        marginBottom: 40,
     },
     header: {
         display: "flex",
@@ -147,8 +225,8 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: colors.brown300,
     },
-    emailSec: {
-        gap: 8,
+    form: {
+        gap: 12,
     },
     input: {
         borderWidth: 1,
@@ -157,5 +235,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         paddingHorizontal: 6,
     },
-    
+    errormsg: {
+        color: "red",
+        fontSize: 12
+    }
+
 });
