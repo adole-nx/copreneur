@@ -18,17 +18,17 @@ export default function RootLayout() {
             }} />
           :
           <Stack.Screen
-            name="signin"
+            name="index"
             options={{
-              title: "Sign In",
+              title: "Welcome",
               headerShown: false,
             }} />
         }
 
         <Stack.Screen
-          name="index"
+          name="signin"
           options={{
-            title: "Welcome",
+            title: "Sign In",
             headerShown: false,
           }} />
 

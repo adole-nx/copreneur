@@ -1,28 +1,100 @@
-import { Link } from "expo-router";
-import { StyleSheet, Text } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import Feather from '@expo/vector-icons/Feather';
+import { useFonts } from "expo-font";
+import { Link } from 'expo-router';
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import { StatusBar } from "react-native-web";
+import { forDevelopers, forEntrepreneurs } from "../assets/local-data/benefits";
+import { Seperator } from '../components/ListSeperator';
+import { colors } from "../theme/colors";
 
+SplashScreen.preventAutoHideAsync();
 
-export default function Index () {
+export default function Index() {
+    const [loaded, error] = useFonts({
+        "Polea": require("../assets/fonts/Polea.otf"),
+    });
+
+    useEffect(() => {
+        if (loaded || error) {
+            SplashScreen.hideAsync();
+        }
+    }, [loaded, error]);
+
+    if (!loaded && !error) {
+        return null;
+    }
     return (
-        <SafeAreaProvider>
-            <SafeAreaView>
-                <Text>Welcome screen</Text>
-                <Text>Welcome to copreneur</Text>
-                <Link 
-                href="/signup"
-                style={{
-                    fontWeight: "bold",
-                    color: "brown"
-                }}>Create a new accout</Link>
-            </SafeAreaView>
-        </SafeAreaProvider>
+        <View className="px-4 pb-4 pt-8">
+            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+            <ScrollView
+            showsVerticalScrollIndicator={false}>
+                <Text style={styles.brandText}>Copreneur</Text>
+
+                {/* for developers */}
+                <View style={{ backgroundColor: colors.brown100 }} className="flex flex-col gap-y-3 rounded-lg p-3">
+                    <Text className="font-bold text-3xl">For Developers</Text>
+                    <FlatList
+                        data={forDevelopers}
+                        keyExtractor={item => item.id}
+                        ItemSeparatorComponent={() => (<Seperator w={0} h={8} />)}
+                        renderItem={({ item }) => (
+                            <View style={{ backgroundColor: colors.brown400 }} className="h-12 flex
+                            flex-row items-center gap-4 rounded-lg px-2">
+                                <Feather name="check-square" size={24} color="white" />
+                                <Text className="text-lg font-semibold text-white">{item.text}</Text>
+                            </View>
+                        )} />
+                </View>
+
+                {/* get started */}
+                <View className="min-h-24 flex flex-col gap-y-4 bg-brown-800 rounded-lg my-12">
+                    <Text className="font-bold text-3xl">Get Started</Text>
+                    <Text className="flex flex-row justify-between items-center gap-x-3">Whether you are an entrepreneur or developer,
+                        start connecting to move your projrcts forward.</Text>
+
+                    <View className="flex flex-row items-center gap-x-3">
+                        <Link href="/signin" style={{ backgroundColor: colors.brown400 }} className="bg-black rounded-lg p-6">
+                            <Text className="text-white text-xs">I have an account</Text>
+                        </Link>
+
+                        <Link href="/signup" style={{ backgroundColor: colors.brown200 }} className="rounded-lg p-6">
+                            <Text className="text-white text-xs">I am new here</Text>
+                        </Link>
+
+                    </View>
+                </View>
+
+                {/* for entrepreneurs */}
+                <View style={{ backgroundColor: colors.brown100 }} className="flex flex-col gap-y-3 rounded-lg p-3">
+                    <Text className="font-bold text-3xl">For Developers</Text>
+                    <FlatList
+                        data={forEntrepreneurs}
+                        keyExtractor={item => item.id}
+                        ItemSeparatorComponent={() => (<Seperator w={0} h={8} />)}
+                        renderItem={({ item }) => (
+                            <View style={{ backgroundColor: colors.brown400 }} className="h-12 flex
+                            flex-row items-center gap-4 rounded-lg px-2">
+                                <Feather name="check-square" size={24} color="white" />
+                                <Text className="text-lg font-semibold text-white">{item.text}</Text>
+                            </View>
+                        )} />
+                </View>
+            </ScrollView>
+        </View>
     )
-}
+};
 
 const styles = StyleSheet.create({
-    p: {
-        fontSize: 16, //units is points
-        fontWeight: "bold"
+    wrapper: {
+        flex: 1
+    },
+    brandText: {
+        fontFamily: "Polea",
+        fontSize: 48,
+        marginBottom: 16,
+        color: colors.brown400
+
     }
-})
+});
