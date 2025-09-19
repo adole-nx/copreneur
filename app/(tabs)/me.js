@@ -1,28 +1,96 @@
-import { Link } from "expo-router";
-import { StyleSheet, Text } from "react-native";
+import { useRouter } from "expo-router";
+import { signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { useContext, useEffect, useState } from "react";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { AuthContext } from "../../config/auth-context.config";
+import { db } from "../../settings/firebase";
+import { colors } from "../../theme/colors";
 
 
-export default function Me () {
-    return (
-        <SafeAreaProvider>
-            <SafeAreaView>
-                <Text>Welcome screen</Text>
-                <Text>Welcome to copreneur</Text>
-                <Link 
-                href="/signup"
-                style={{
-                    fontWeight: "bold",
-                    color: "brown"
-                }}>Create a new accout</Link>
-            </SafeAreaView>
-        </SafeAreaProvider>
-    )
+export default function Me() {
+    const { user } = useContext(AuthContext);
+    const [userRecords, setUserRecords] = useState(null);
+
+    const router = useRouter();
+
+    // handle sign out
+    const handleSignOut = async () => {
+        await signOut(auth)
+        .then(() => {
+            router.replace("signin")
+        })
+        .catch((error) => console.log("Error occured whiile signing out",error))
+    }
+
+    useEffect(() => {
+        const handleGetDoc = async () => {
+            try {
+                const docSnap = await getDoc(doc(db, "users", user.uid));
+                if (docSnap.exists()) {
+                    setUserRecords(docSnap.data())
+                }
+
+            } catch (error) {
+                console.log("Error >>>>:", error)
+            }
+        }
+        user && handleGetDoc();
+    }, [user]);
+
+    console.log("?????", userRecords)
+
+    if (userRecords === null) {
+        return (
+            <SafeAreaProvider>
+                <SafeAreaView style={styles.wrapper}>
+                    <ActivityIndicator size="large" color={colors.brown300} />
+                    <Text className="text-xs text-gray-600">... loading your data</Text>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        )
+    } else {
+        return (
+            <SafeAreaProvider>
+                <SafeAreaView style={styles.content}>
+                    {/* header */}
+                    <View className="flex flex-row gap-x-2 items-center">
+                        <Text className="text-gray-800 text-xl">Hello</Text>
+                        <Text className="text-gray-800 text-xl">{userRecords.firstName}</Text>
+                    </View>
+
+                    {/* body */}
+                    <View></View>
+
+                    {/* footer */}
+                    <View className="flex flex-row justify-center items-center">
+                        <Pressable onPress={handleSignOut} className="p-3 bg-red-700 rounded-sm">
+                            <Text classname="text-sx font-semibold">Sign out</Text>
+                        </Pressable>
+
+                    </View>
+
+                </SafeAreaView>
+            </SafeAreaProvider>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
+    wrapper: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+
+    },
     p: {
         fontSize: 16, //units is points
         fontWeight: "bold"
+    },
+    content: {
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "space-between"
     }
 })

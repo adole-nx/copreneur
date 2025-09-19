@@ -3,10 +3,9 @@ import { useFonts } from "expo-font";
 import { Link } from 'expo-router';
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { StatusBar } from "react-native-web";
-import { forDevelopers, forEntrepreneurs } from "../assets/local-data/benefits";
-import { Seperator } from '../components/ListSeperator';
+import { forDevelopers } from "../assets/local-data/benefits";
 import { colors } from "../theme/colors";
 
 SplashScreen.preventAutoHideAsync();
@@ -27,25 +26,23 @@ export default function Index() {
     }
     return (
         <View className="px-4 pb-4 pt-8">
-            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true} />
+            <StatusBar barStyle="light-content" backgroundColor="transparent" translucent={false} />
             <ScrollView
-            showsVerticalScrollIndicator={false}>
+                showsVerticalScrollIndicator={false}>
                 <Text style={styles.brandText}>Copreneur</Text>
 
                 {/* for developers */}
                 <View style={{ backgroundColor: colors.brown100 }} className="flex flex-col gap-y-3 rounded-lg p-3">
                     <Text className="font-bold text-3xl">For Developers</Text>
-                    <FlatList
-                        data={forDevelopers}
-                        keyExtractor={item => item.id}
-                        ItemSeparatorComponent={() => (<Seperator w={0} h={8} />)}
-                        renderItem={({ item }) => (
-                            <View style={{ backgroundColor: colors.brown400 }} className="h-12 flex
+                    <View className="flex flex-col gap-y-3">
+                        {forDevelopers.map((item) => (
+                            <View key={item.id} style={{ backgroundColor: colors.brown400 }} className="h-12 flex
                             flex-row items-center gap-4 rounded-lg px-2">
                                 <Feather name="check-square" size={24} color="white" />
                                 <Text className="text-lg font-semibold text-white">{item.text}</Text>
                             </View>
-                        )} />
+                        ))}
+                    </View>
                 </View>
 
                 {/* get started */}
@@ -69,17 +66,15 @@ export default function Index() {
                 {/* for entrepreneurs */}
                 <View style={{ backgroundColor: colors.brown100 }} className="flex flex-col gap-y-3 rounded-lg p-3">
                     <Text className="font-bold text-3xl">For Developers</Text>
-                    <FlatList
-                        data={forEntrepreneurs}
-                        keyExtractor={item => item.id}
-                        ItemSeparatorComponent={() => (<Seperator w={0} h={8} />)}
-                        renderItem={({ item }) => (
-                            <View style={{ backgroundColor: colors.brown400 }} className="h-12 flex
+                    <View className="flex flex-col gap-y-3">
+                        {forDevelopers.map((item) => (
+                            <View key={item.id} style={{ backgroundColor: colors.brown400 }} className="h-12 flex
                             flex-row items-center gap-4 rounded-lg px-2">
                                 <Feather name="check-square" size={24} color="white" />
                                 <Text className="text-lg font-semibold text-white">{item.text}</Text>
                             </View>
-                        )} />
+                        ))}
+                    </View>
                 </View>
             </ScrollView>
         </View>
