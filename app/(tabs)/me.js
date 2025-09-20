@@ -56,8 +56,8 @@ export default function Me() {
                 <SafeAreaView style={styles.content}>
                     {/* header */}
                     <View className="flex flex-row gap-x-2 items-center">
-                        <Text className="text-gray-800 text-xl">Hello</Text>
-                        <Text className="text-gray-800 text-xl">{userRecords.firstName}</Text>
+                        <Text className="text-gray-800 text-xl font-bold">Hello</Text>
+                        <Text className="text-gray-800 text-xl font-bold" style={{color: colors.brown300}}>{userRecords.firstName}</Text>
                     </View>
 
                     {/* body */}
@@ -65,8 +65,8 @@ export default function Me() {
 
                     {/* footer */}
                     <View className="flex flex-row justify-center items-center">
-                        <Pressable onPress={handleSignOut} className="p-3 bg-red-700 rounded-sm">
-                            <Text classname="text-sx font-semibold">Sign out</Text>
+                        <Pressable onPress={handleSignOut} className="p-3 bg-black-700 rounded-full">
+                            <Text classname="text-sx font-semibold text-white">Sign out</Text>
                         </Pressable>
 
                     </View>
@@ -91,6 +91,8 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         flexDirection: "column",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        paddingVertical: 16,
+        paddingHorizontal: 8
     }
 })
