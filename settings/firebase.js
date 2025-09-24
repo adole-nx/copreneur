@@ -10,7 +10,7 @@ import { getApp, getApps, initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyC_4odc2E2T_d3A2ls-ibpkIXAZJq97eDk",
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: "copreneur-5421d.firebaseapp.com",
   projectId: "copreneur-5421d",
   storageBucket: "copreneur-5421d.firebasestorage.app",

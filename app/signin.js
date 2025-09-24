@@ -35,7 +35,7 @@ export default function Signin() {
                     [{text: "okay"}]
                 );
                 console.error(error);
-                setIsLoading;
+                setIsLoading(false);
              }
         },
         validationSchema: signinValidation

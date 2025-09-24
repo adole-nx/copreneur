@@ -48,7 +48,7 @@ export default function Signup() {
                     [{text: "Dismiss"}]
                 );
                 console.error(error);
-                setIsLoading;
+                setIsLoading(false);
                 
             }
         },
