@@ -1,23 +1,45 @@
+import { useRouter } from "expo-router";
+import { addDoc, collection } from "firebase/firestore";
 import { useFormik } from "formik";
 import { useContext, useState } from "react";
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { AuthContext } from "../../config/auth-context.config";
+import { db } from "../../settings/firebase";
 import { colors } from "../../theme/colors";
 import { createPostValidation } from "../../utilis/create-post-validation-schema";
+
 
 export default function Create() {
     const [isLoading, setIsLoading] = useState(false);
     const { user } = useContext(AuthContext);
 
-    const { handleBlur, handleChange, handleSubmit, touched, errors, values } = useFormik({
-        initialValues: { context: "" },
+    const router = useRouter();
+
+    const { handleBlur, handleChange, handleSubmit, touched, errors, values, resetForm } = useFormik({
+        initialValues: { content: "" },
         onSubmit: async () => {
             setIsLoading(true);
 
             try {
                 // create post on database
-                setIsLoading(false); // stops ActivityIndicator
+                const docId = await addDoc(collection(db, "posts"), {
+                    text: values.content,
+                    createdAt: new Date().getTime(),
+                    author: user.uid,
+                    likes: 0,
+                });
 
+                setIsLoading(false); // stops Activityindicator
+                resetForm(); // clears all fields
+
+                Alert.alert(
+                    "Notification",
+                    "Post published!",
+                    [
+                        { text: "Dismiss" },
+                        { text: "back to home", onPress: () => router.replace("(tabs)") }
+                    ]
+                )
 
 
             } catch (error) {
@@ -34,6 +56,8 @@ export default function Create() {
         validationSchema: createPostValidation
     });
 
+    console.log(values.content)
+
     return (
         <KeyboardAvoidingView
             style={styles.wrapper}
@@ -46,38 +70,42 @@ export default function Create() {
             <ScrollView
                 contentContainerStyle={styles.ScrollViewContainer}
                 showsVerticalScrollIndicator={false}>
+                <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true}/>
 
                 {/* body group  */}
                 <View style={styles.body}>
-                    <Text style={styles.bodyText}>What do you want to share</Text>
+                    <Text className="font-bold test-lg">Hello, {user.displayName}</Text>
+                    <Text style={styles.bodyText}>What do you want to share?</Text>                
 
-                </View>
+                    {/* create account with email and password */}
+                    <View style={styles.form}>
 
-                {/* create account with email and password */}
-                <View style={styles.form}>
+                        <View style={styles.inputBlock}>
+                            <TextInput
+                                keyboardType="default"
+                                style={styles.input}
+                                multiline={true}
+                                numberOfLines={4}
+                                value={values.content} // assign the current value of the textinput
+                                onChangeText={handleChange("content")}
+                                onBlur={handleBlur("content")}
+                            />
+                            {errors.content && touched.content &&
+                                <Text style={styles.errormsg}>{errors.content}</Text>}
 
-                    <View style={styles.inputBlock}>
-                        <TextInput
-                            keyboardType="default"
-                            style={styles.input}
-                            // assign the current value of the textinput
-                            value={values.context}
-                            onChangeText={handleChange("context")}
-                            onBlur={handleBlur("context")}
-                        />
-                        {errors.context && touched.context &&
-                            <Text style={styles.errormsg}>{errors.context}</Text>}
+                        </View>
+
+                        <View className="flex flex-row justify-end">
+                            <TouchableOpacity onPress={handleSubmit} style={styles.signupBtn}>
+                                {isLoading ?
+                                    <ActivityIndicator size="large" color="white" /> :
+                                    <Text style={styles.signInText}>Create</Text>}
+                            </TouchableOpacity>
+                        </View>
 
                     </View>
-
-
-                    <TouchableOpacity onPress={handleSubmit} style={styles.signupBtn}>
-                        {isLoading ?
-                            <ActivityIndicator size="large" color="white" /> :
-                            <Text style={styles.signInText}>Create</Text>}
-                    </TouchableOpacity>
                 </View>
-            
+
             </ScrollView>
         </KeyboardAvoidingView >
     )
@@ -89,26 +117,21 @@ const styles = StyleSheet.create({
         paddingTop: StatusBar.currentHeight,
     },
     ScrollViewContainer: {
-        flexGrow: 1,
-        justifyContent: "space-between",
-        marginBottom: 40,
+        display: "flex",
+        paddingHorizontal: 20,
+        gap: 10
     },
     body: {
         display: "flex",
         gap: 18,
-        paddingHorizontal: 20,
+        paddingHorizontal: 4,
     },
     bodyText: {
         color: colors.brown400,
         fontSize: 18
     },
     signupBtn: {
-        height: 56,
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 16,
+        padding: 10,
         backgroundColor: colors.brown400,
         borderRadius: 4,
 
