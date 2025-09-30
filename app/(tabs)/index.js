@@ -1,20 +1,134 @@
-import { StyleSheet } from "react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useFonts } from "expo-font";
+import { Link } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { collection, doc, getDoc, onSnapshot } from "firebase/firestore";
+import { useContext, useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Pressable, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { Seperator } from "../../components/ListSeperator";
+import PostSnippet from "../../components/PostSnippet";
+import { db } from "../../settings/firebase";
+import { colors } from "../../theme/colors";
+import { AuthContext } from "./../../config/auth-context.config";
 
 
-export default function Index () {
+SplashScreen.preventAutoHideAsync();
+
+
+export default function Index() {
+    const { user } = useContext(AuthContext);
+    const [posts, setPosts] = useState(undefined);
+    const [postsWithAuthorData, setpostsWithAuthorData] = useState(undefined);
+
+    const [loaded, error] = useFonts({
+        "Polea": require("../../assets/fonts/Polea.otf"),
+    });
+
+    useEffect(() => {
+        if (loaded || error) {
+            SplashScreen.hideAsync();
+        }
+    }, [loaded, error]);
+
+    if (!loaded && !error) {
+        return null;
+    }
+
+    // fecth posts data from the database
+    useEffect(() => {
+        const compiledData = [];
+        onSnapshot(collection(db, "posts"), (docs) => {
+            docs.forEach(doc => {
+                compiledData.push({
+                    id: doc.id,
+                    data: doc.data()
+                })
+            });
+
+            setPosts(compiledData);
+        });
+    }, []);
+
+    // fetch authors data and merge with posts data
+    useEffect(() => {
+        if (Array.isArray(posts) && posts.lenth > 0) {
+            const postsWithAuthorsPromises = posts.map(async (post) => {
+                //get author data
+                const docSnap = await getDoc(doc(db, "users",post.data.author));
+                if (docSnap.exists()) {
+                    const mergeData = {
+                        id: post.id,
+                        post: post.data,
+                        author: docSnap.data(),
+                    }
+                    return mergeData                    
+                }
+            });
+
+            const postsWithAuthors = Promise.all(postsWithAuthorsPromises);
+            setpostsWithAuthorData(postsWithAuthors)
+        }
+    }, [posts]);
+
+    console.log(">>>>", postsWithAuthorData)
+
     return (
         <SafeAreaProvider>
-            <SafeAreaView>
-                
+            <StatusBar barStyle="dark-content" backgroundColor="transparent" />
+            <SafeAreaView style={styles.wrapper}>
+                {/* header */}
+                <View className="flex flex-row justify-between">
+                    <Text style={styles.brandText}>Copreneur</Text>
+                    <View className="flex flex-row">
+                        <Pressable>
+                            <Ionicons name="notifications" size={24} color="black" />
+                        </Pressable>
+
+                        <Link href="/(tabs)/profile">
+                            <AntDesign name="user" size={24} color="black" />
+                        </Link>
+                    </View>
+
+                </View>
+                {posts !== undefined
+                    ?
+                    <FlatList
+                        data={posts}
+                        renderItem={({ item }) => {
+                            return (
+                                <PostSnippet postData={item} />
+                            )
+                        }}
+                        keyExtractor={(item) => item.id}
+                        ItemSeparatorComponent={() => <Seperator w={0} h={16} />}
+                    />
+                    :
+                    <View style={styles.bodyEmpty}>
+                        <ActivityIndicator size={36} color={colors.brown300} />
+                        <Text className="italic text-sm text-neutral-500">... feeds loading</Text>
+                    </View>}
+
             </SafeAreaView>
         </SafeAreaProvider>
     )
 }
 
 const styles = StyleSheet.create({
-    p: {
-        fontSize: 16, //units is points
-        fontWeight: "bold"
+    wrapper: {
+        flex: 1,
+        paddingHorizontal: 8
+    },
+    bodyEmpty: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    brandText: {
+        fontFamily: "Polea",
+        fontSize: 28,
+        color: colors.brown400
+
     }
-})
+});

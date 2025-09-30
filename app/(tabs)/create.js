@@ -70,11 +70,10 @@ export default function Create() {
             <ScrollView
                 contentContainerStyle={styles.ScrollViewContainer}
                 showsVerticalScrollIndicator={false}>
-                <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent={true}/>
 
                 {/* body group  */}
                 <View style={styles.body}>
-                    <Text className="font-bold test-lg">Hello, {user.displayName}</Text>
+                    <Text className="font-bold test-lg">Hello, {user?.displayName}</Text>
                     <Text style={styles.bodyText}>What do you want to share?</Text>                
 
                     {/* create account with email and password */}
