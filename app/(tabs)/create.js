@@ -84,7 +84,7 @@ export default function Create() {
                                 keyboardType="default"
                                 style={styles.input}
                                 multiline={true}
-                                numberOfLines={4}
+                                numberOfLines={9}
                                 value={values.content} // assign the current value of the textinput
                                 onChangeText={handleChange("content")}
                                 onBlur={handleBlur("content")}
