@@ -37,49 +37,49 @@ export default function Index() {
     }
 
     // fecth posts data from the database
-    useEffect(() => {
-        const compiledData = [];
-        onSnapshot(collection(db, "posts"), (docs) => {
-            docs.forEach(doc => {
-                compiledData.push({
-                    id: doc.id,
-                    data: doc.data()
-                })
-            });
-
-            setPosts(compiledData);
+    const compiledData = [];
+    onSnapshot(collection(db, "posts"), (docs) => {
+        docs.forEach(doc => {
+            compiledData.push({
+                id: doc.id,
+                data: doc.data()
+            })
         });
-    }, []);
+
+        setPosts(compiledData);
+    });
 
     // fetch authors data and merge with posts data
     useEffect(() => {
-        if (Array.isArray(posts) && posts.lenth > 0) {
-            const postsWithAuthorsPromises = posts.map(async (post) => {
-                //get author data
-                const docSnap = await getDoc(doc(db, "users",post.data.author));
-                if (docSnap.exists()) {
-                    const mergeData = {
-                        id: post.id,
-                        post: post.data,
-                        author: docSnap.data(),
+        const handlePostWithAuthorProfile = async () => {
+            if (Array.isArray(posts) && posts.length > 0) {
+                const postsWithAuthorsPromises = posts.map(async (post) => {
+                    //get author data
+                    const docSnap = await getDoc(doc(db, "users", post.data.author));
+                    if (docSnap.exists()) {
+                        return {
+                            id: post.id,
+                            data: post.data,
+                            author: docSnap.data(),
+                        }
                     }
-                    return mergeData                    
-                }
-            });
+                });
 
-            const postsWithAuthors = Promise.all(postsWithAuthorsPromises);
-            setpostsWithAuthorData(postsWithAuthors)
+                const postsWithAuthors = await Promise.all(postsWithAuthorsPromises);
+                setpostsWithAuthorData(postsWithAuthors)
+            }
         }
+        handlePostWithAuthorProfile();
     }, [posts]);
 
-    console.log(">>>>", postsWithAuthorData)
+    console.log("posts with author data", postsWithAuthorData)
 
     return (
         <SafeAreaProvider>
             <StatusBar barStyle="dark-content" backgroundColor="transparent" />
             <SafeAreaView style={styles.wrapper}>
                 {/* header */}
-                <View className="flex flex-row justify-between">
+                <View className="flex flex-row justify-between mb-3">
                     <Text style={styles.brandText}>Copreneur</Text>
                     <View className="flex flex-row">
                         <Pressable>
@@ -92,10 +92,12 @@ export default function Index() {
                     </View>
 
                 </View>
-                {posts !== undefined
+
+                {/* render posts */}
+                {postsWithAuthorData !== undefined
                     ?
                     <FlatList
-                        data={posts}
+                        data={postsWithAuthorData}
                         renderItem={({ item }) => {
                             return (
                                 <PostSnippet postData={item} />

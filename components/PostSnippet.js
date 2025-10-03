@@ -1,12 +1,28 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Link } from 'expo-router';
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { colors } from '../theme/colors';
 
 export default function PostSnippet({ postData }) {
     return (
         <View>
             {/* author info and time */}
+            <View className="flex flex-row justify-between">
+                {/* left: author bio */}
+                <Link href="/user-profile">
+                    <View className="flex flex-row items-center">
+                        <View style={styles.profileCircle}>
+                            <Text>{postData.author.firstName[0]}</Text>
+                        </View>
+                        <Text className="font-bold">{`${postData.author.firstName} ${postData.author.lastName}`}</Text>
+                    </View>
+                </Link>
 
-            <Text>{postData.data.text}</Text>
+                {/* right: time past since post was made */}
+
+            </View>
+
+            <Text className="font-semibold text-md text-neutral-700">{postData.data.text}</Text>
 
             {/* interactions */}
             <View className="flex flex-row justify-end items-center gap-6">
@@ -20,3 +36,15 @@ export default function PostSnippet({ postData }) {
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    profileCircle: {
+        display: "flex",
+        height: 48,
+        width: 48,
+        borderRadius: 24,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: colors.brown300
+    }
+});
